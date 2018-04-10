@@ -1,0 +1,5 @@
+__pycache__/
+.idea/
+credentials.json
+db.sqlite
+tba_cache.json
