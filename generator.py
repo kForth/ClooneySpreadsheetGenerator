@@ -9,8 +9,8 @@ from tba_py import TBA
 
 
 class SpreadsheetGenerator:
-    def __init__(self, db, tba):
-        self.db = db
+    def __init__(self, db_path, tba):
+        self.db_path = db_path
         self.tba = tba
 
         self.workbook = None
@@ -57,11 +57,12 @@ class SpreadsheetGenerator:
         self.formats = dict([(k, self.workbook.add_format(v)) for k, v in self.raw_formats.items()])
 
         self.headers = json.load(open('headers.json'))
+        db = sqlite3.connect(self.db_path)
         self.event = db.execute('SELECT * FROM events WHERE id = "{}"'.format(event_id)).fetchone()
         self.raw_entries = [json.loads(e[-2]) for e in
                             db.execute('SELECT * FROM scouting_entries WHERE event = "{}"'.format(event_id)).fetchall()]
         self.teams = sorted(json.loads(self.event[2]), key=lambda x: int(x['team_number']))
-        self.matches = sorted([e for e in tba.get_event_matches(event_id) if e['comp_level'] == 'qm'],
+        self.matches = sorted([e for e in self.tba.get_event_matches(event_id) if e['comp_level'] == 'qm'],
                               key=lambda x: x['match_number'])
         for match in self.matches:
             for alli in ['red', 'blue']:
@@ -256,7 +257,7 @@ class SpreadsheetGenerator:
                     self.formats[header['header_format'] if 'header_format' in header.keys() else 'pretty_header']
             )
             for i in range(data_len):
-                val = '=raw_{}'.format(header['key'])  # self.raw_entries[i][header['key']]
+                val = '=raw_{}'.format(header['key'])
                 sheet.write(self.get_cell(col, i + 2), val, self.formats[header['format'] if 'format' in header.keys() else 'pretty_data_cell'])
             col = self.next_col(col)
 
@@ -267,7 +268,7 @@ class SpreadsheetGenerator:
                     self.formats[header['header_format'] if 'header_format' in header.keys() else 'pretty_header']
             )
             for i in range(data_len):
-                val = '=raw_calculated_{}'.format(header['key'])  # self.raw_entries[i][header['key']]
+                val = '=raw_calculated_{}'.format(header['key'])
                 sheet.write(self.get_cell(col, i + 2), val, self.formats[header['format'] if 'format' in header.keys() else 'pretty_data_cell'])
             col = self.next_col(col)
 
@@ -714,9 +715,10 @@ class SpreadsheetGenerator:
 
 
 if __name__ == "__main__":
-    db = sqlite3.connect('/Users/kestin/db.sqlite')
+    db = '/Users/kestin/Projects/OldClooney/db/db.sqlite'
     tba = TBA('GdZrQUIjmwMZ3XVS622b6aVCh8CLbowJkCs5BmjJl2vxNuWivLz3Sf3PaqULUiZW')
     filename = '/Users/kestin/Google Drive/Scouting/Clooney.xlsx'
+    event_id = '2018onham'
     gen = SpreadsheetGenerator(db, tba)
-    gen.create_spreadsheet_for_event('2018onham', filename=filename)
-    gen.upload_to_google_drive(filename)
+    gen.create_spreadsheet_for_event(event_id, filename=filename)
+    gen.upload_to_google_drive(filename, upload_filename='Clooney {}'.format(event_id))
