@@ -1,6 +1,5 @@
 import json
 import sqlite3
-import re
 
 import xlsxwriter
 from pydrive.auth import GoogleAuth
@@ -29,12 +28,14 @@ class SpreadsheetGenerator:
             'raw_team_list':        'raw_team_list',
             'raw_matches':          'raw_matches',
             'raw_team_schedule':    'raw_team_schedule',
+            'pretty_team_image':    'Team Image',
+            'pretty_raw':           'Raw Data',
             'pretty_team_list':     'Team List',
             'pretty_analysis':      'Analysis',
-            'pretty_raw':           'Raw',
             'pretty_matches':       'Schedule',
             'pretty_team_schedule': 'Team Schedule',
-            'team_stats':           'Team Stats'
+            'team_stats':           'Team Stats',
+            'match_rundown':        'Match Rundown'
         }
 
         self.raw_formats = json.load(open('formats.json'))
@@ -69,10 +70,12 @@ class SpreadsheetGenerator:
                     match[alli + '_' + str(i + 1)] = int(match['alliances'][alli]['team_keys'][i][3:])
 
         self.draw_pretty_analysis()
+        self.draw_pretty_match_rundown()
         self.draw_pretty_team_stats()
         self.draw_pretty_team_schedule()
         self.draw_pretty_schedule()
         self.draw_pretty_team_list()
+        self.draw_pretty_raw_data()
 
         self.draw_raw_data()
         self.draw_raw_calculated()
@@ -111,6 +114,7 @@ class SpreadsheetGenerator:
         headers = self.headers['raw']
         sheet = self.workbook.add_worksheet(page_name)
         sheet.set_tab_color('red')
+        sheet.hide()
         col = 'A'
         row = 1
         header_cols = {}
@@ -132,7 +136,7 @@ class SpreadsheetGenerator:
         headers = self.headers['raw_calculated']
         sheet = self.workbook.add_worksheet(page_name)
         sheet.set_tab_color('red')
-        sheet.protect()
+        sheet.hide()
         data_len = len(self.raw_entries)
         col = 'A'
         for header in headers:
@@ -147,7 +151,7 @@ class SpreadsheetGenerator:
         headers = self.headers['analysis']
         sheet = self.workbook.add_worksheet(page_name)
         sheet.set_tab_color('red')
-        sheet.protect()
+        sheet.hide()
         num_teams = len(self.teams)
 
         functions = {
@@ -174,7 +178,7 @@ class SpreadsheetGenerator:
         headers = self.headers['team_list']
         sheet = self.workbook.add_worksheet(page_name)
         sheet.set_tab_color('red')
-        sheet.protect()
+        sheet.hide()
         data_len = len(self.teams)
         col = 'A'
         for header in headers:
@@ -190,7 +194,7 @@ class SpreadsheetGenerator:
         page_name = self.page_names['raw_team_schedule']
         sheet = self.workbook.add_worksheet(page_name)
         sheet.set_tab_color('red')
-        sheet.protect()
+        sheet.hide()
         data_len = len(self.teams)
         col = 'A'
         sheet.write(self.get_cell(col, 1), 'Team Number')
@@ -205,8 +209,9 @@ class SpreadsheetGenerator:
         for i in range(data_len):
             for j in range(20):
                 sheet.write_array_formula(
-                        "{0}:{0}".format(self.get_cell(self.next_col(col, j), i+2)),
-                        "=ArrayFormula(IFERROR(SMALL(IF(schedule_match_teams=$A{0},ROW(schedule_red_1)-1), ROW({1}:{1}))))".format(i+2, j+1),
+                        "{0}:{0}".format(self.get_cell(self.next_col(col, j), i + 2)),
+                        "=ArrayFormula(IFERROR(SMALL(IF(schedule_match_teams=$A{0},ROW(schedule_red_1)-1), ROW({1}:{1}))))".format(
+                                i + 2, j + 1),
                         self.formats['raw_data_cell']
                 )
 
@@ -215,7 +220,7 @@ class SpreadsheetGenerator:
         headers = self.headers['matches']
         sheet = self.workbook.add_worksheet(page_name)
         sheet.set_tab_color('red')
-        sheet.protect()
+        sheet.hide()
         data_len = len(self.matches)
         col = 'A'
         red_1_col = col
@@ -228,20 +233,51 @@ class SpreadsheetGenerator:
             elif header['key'] == 'blue_3':
                 blue_3_col = col
             for i in range(data_len):
-                sheet.write(self.get_cell(col, i + 2), self._get_data(self.matches[i], header['key']), self.formats['raw_data_cell'])
+                sheet.write(self.get_cell(col, i + 2), self._get_data(self.matches[i], header['key']),
+                            self.formats['raw_data_cell'])
             col = self.next_col(col)
         self.workbook.define_name(
                 'schedule_match_teams',
                 "='{0}'!{1}:{2}".format(page_name, red_1_col, blue_3_col)
         )
 
+    def draw_pretty_raw_data(self):
+        page_name = self.page_names['pretty_raw']
+        raw_headers = self.headers['raw']
+        calc_headers = self.headers['raw_calculated']
+        sheet = self.workbook.add_worksheet(page_name)
+        sheet.set_tab_color('blue')
+        col = 'A'
+        row = 1
+        data_len = len(self.raw_entries)
+        for header in raw_headers:
+            sheet.write(
+                    self.get_cell(col, row),
+                    header['title'],
+                    self.formats[header['header_format'] if 'header_format' in header.keys() else 'pretty_header']
+            )
+            for i in range(data_len):
+                val = '=raw_{}'.format(header['key'])  # self.raw_entries[i][header['key']]
+                sheet.write(self.get_cell(col, i + 2), val, self.formats[header['format'] if 'format' in header.keys() else 'pretty_data_cell'])
+            col = self.next_col(col)
+
+        for header in calc_headers[3:]:
+            sheet.write(
+                    self.get_cell(col, row),
+                    header['title'],
+                    self.formats[header['header_format'] if 'header_format' in header.keys() else 'pretty_header']
+            )
+            for i in range(data_len):
+                val = '=raw_calculated_{}'.format(header['key'])  # self.raw_entries[i][header['key']]
+                sheet.write(self.get_cell(col, i + 2), val, self.formats[header['format'] if 'format' in header.keys() else 'pretty_data_cell'])
+            col = self.next_col(col)
+
     def draw_pretty_team_list(self):
         page_name = self.page_names['pretty_team_list']
         headers = self.headers['team_list']
         sheet = self.workbook.add_worksheet(page_name)
         sheet.set_tab_color('blue')
-        sheet.protect('', {'sort': 1})
-        sheet.set_default_row(20, True)
+        sheet.set_default_row(16, True)
         sheet.set_row(0, 35)
         data_len = len(self.teams)
         col = 'A'
@@ -272,8 +308,7 @@ class SpreadsheetGenerator:
         headers = self.headers['matches']
         sheet = self.workbook.add_worksheet(page_name)
         sheet.set_tab_color('blue')
-        sheet.protect('', {'sort': 1})
-        sheet.set_default_row(20, True)
+        sheet.set_default_row(16, True)
         sheet.set_row(0, 35)
         data_len = len(self.matches)
         col = 'A'
@@ -315,9 +350,8 @@ class SpreadsheetGenerator:
         headers = self.headers['analysis']
         sheet = self.workbook.add_worksheet(page_name)
         sheet.set_tab_color('green')
-        sheet.protect('', {'sort': 1})
         sheet.set_default_row(16, True)
-        sheet.set_row(0, 100)
+        sheet.set_row(0, 70)
         data_len = len(self.teams)
         col = 'A'
         team_num_col = col
@@ -370,14 +404,13 @@ class SpreadsheetGenerator:
         headers = self.headers['matches']
         sheet = self.workbook.add_worksheet(page_name)
         sheet.set_tab_color('blue')
-        sheet.protect('', {'sort': 1})
-        sheet.write('B2', 'Team:')
+        sheet.write('B2', 'Team:', self.formats['team_input_label'])
         sheet.write('C2', int(self.teams[0]["team_number"]), self.formats['team_input'])
         sheet.data_validation('C2', {
             'validate': 'list',
             'source':   '=team_number_list'
         })
-        sheet.set_default_row(20, True)
+        sheet.set_default_row(16, True)
         sheet.set_row(3, 35)
         data_len = 20
         col = 'B'
@@ -403,20 +436,19 @@ class SpreadsheetGenerator:
                 })
             for i in range(data_len):
                 if header['title'] == 'Match':
-                    # sheet.set_column(self.get_col_range(col), cell_format=self.formats['schedule_data_cell'])
                     match_num_col = col
                     sheet.write(
-                        self.get_cell(col, 5),
-                        "=TRANSPOSE(FILTER(team_schedule_matches, team_schedule_team_number=$C$2))",
-                        self.formats[header['format']] if 'format' in header.keys()
-                        else self.formats['pretty_data_cell']
+                            self.get_cell(col, 5),
+                            "=TRANSPOSE(FILTER(team_schedule_matches, team_schedule_team_number=$C$2))",
+                            self.formats[header['format']] if 'format' in header.keys()
+                            else self.formats['pretty_data_cell']
                     )
                     for i in range(1, data_len):
                         sheet.write_blank(
-                            self.get_cell(col, 5 + i),
-                            "",
-                            self.formats[header['format']] if 'format' in header.keys()
-                            else self.formats['pretty_data_cell']
+                                self.get_cell(col, 5 + i),
+                                "",
+                                self.formats[header['format']] if 'format' in header.keys()
+                                else self.formats['pretty_data_cell']
                         )
                 else:
                     for i in range(data_len):
@@ -444,69 +476,185 @@ class SpreadsheetGenerator:
 
     def draw_pretty_team_stats(self):
         page_name = self.page_names['team_stats']
-        headers = self.headers['raw']
+        header_dict = {
+            'raw': self.headers['raw'],
+            'raw_calculated':  self.headers['raw_calculated'][3:]
+        }
         sheet = self.workbook.add_worksheet(page_name)
         sheet.set_tab_color('green')
-        sheet.protect('', {'sort': 1})
-        sheet.write('B2', 'Team:')
+        sheet.write('B1', 'Team:', self.formats['team_input_label'])
+        sheet.write('C1', int(self.teams[0]["team_number"]), self.formats['team_input'])
+        sheet.data_validation('C1', {
+            'validate': 'list',
+            'source':   '=team_number_list'
+        })
+        sheet.set_default_row(16, True)
+        sheet.set_row(3, 70)
+        data_len = 20
+        col = 'A'
+        for key, headers in header_dict.items():
+            for header in headers:
+                sheet.write(
+                        self.get_cell(col, 4),
+                        header['title'],
+                        self.formats[header['header_format']] if 'header_format' in header.keys()
+                        else self.formats['pretty_header']
+                )
+                options = {}
+                if "hidden" in header.keys():
+                    options['hidden'] = header['hidden']
+                sheet.set_column(self.get_col_range(col), header['width'] if "width" in header.keys() else 8,
+                                 options=options)
+
+                sheet.write(
+                        self.get_cell(col, 5),
+                        "=IFERROR(LOOKUP($C1, analysis_team_number, analysis_{}{}))"
+                            .format('' if key == 'raw' else 'calculated_', header['key']),
+                        self.formats['pretty_avg_cell']
+                )
+                sheet.write(
+                        self.get_cell(col, 6),
+                        "=FILTER({0}_{1}, {0}_team_number=$C$1)".format(key, header['key']),
+                        self.formats[header['format']] if 'format' in header.keys()
+                        else self.formats['pretty_data_cell']
+                )
+
+                for i in range(1, data_len):
+                    sheet.write(
+                            self.get_cell(col, 6 + i),
+                            "",
+                            self.formats[header['format']] if 'format' in header.keys()
+                            else self.formats['pretty_data_cell']
+                    )
+
+                if "scale" in header.keys():
+                    sheet.conditional_format(self.get_col_range(col, 6, data_len), {
+                        'type':     'cell',
+                        'criteria': '=',
+                        'value':    0,
+                        'format':   self.formats[header['format']] if 'format' in header.keys()
+                                    else self.formats['pretty_data_cell']
+                    })
+                    sheet.conditional_format(self.get_col_range(col, 6, data_len), self.range_formats[header['scale']])
+
+                col = self.next_col(col)
+
+    def draw_pretty_match_rundown(self):
+        page_name = self.page_names['match_rundown']
+        raw_header_dict = {
+            'raw': self.headers['raw'],
+            'raw_calculated':  self.headers['raw_calculated'][3:]
+        }
+        analysis_headers = self.headers['analysis']
+        sheet = self.workbook.add_worksheet(page_name)
+        sheet.set_tab_color('green')
+        sheet.set_default_row(10, True)
+
+        sheet.write('B2', 'Team:', self.formats['team_input_label'])
         sheet.write('C2', int(self.teams[0]["team_number"]), self.formats['team_input'])
         sheet.data_validation('C2', {
             'validate': 'list',
             'source':   '=team_number_list'
         })
-        sheet.protect('', {'sort': 1})
-        sheet.set_default_row(16, True)
-        sheet.set_row(3, 100)
-        data_len = 20
+
+        sheet.write('A1', '=FILTER(team_schedule_matches, team_schedule_team_number=C2)')
+        sheet.set_row(0, None, None, {'hidden': True})
+        sheet.write('D2', 'Match:', self.formats['team_input_label'])
+        sheet.write('E2', '=A1', self.formats['team_input'])
+        sheet.data_validation('E2', {
+            'validate': 'list',
+            'source':   'A1:{}1'.format(self.next_col('A', 20))
+        })
+
         col = 'A'
-        for header in headers:
+        row = 3
+        team_num_col = col
+        sheet.set_row(row - 1, 70)
+        for header in analysis_headers:
             sheet.write(
-                    self.get_cell(col, 4),
+                    self.get_cell(col, row),
                     header['title'],
                     self.formats[header['header_format']] if 'header_format' in header.keys()
                     else self.formats['pretty_header']
             )
-            options = {}
-            if "hidden" in header.keys():
-                options['hidden'] = header['hidden']
-            sheet.set_column(self.get_col_range(col), header['width'] if "width" in header.keys() else 8,
-                             options=options)
-
-            sheet.write(
-                    self.get_cell(col, 5),
-                    "=LOOKUP($C2, analysis_team_number, analysis_{})".format(header['key']),
-                    self.formats['pretty_avg_cell']
-            )
-            sheet.write(
-                    self.get_cell(col, 6),
-                    "=FILTER(raw_{}, raw_team_number=$C$2)".format(header['key']),
-                    self.formats[header['format']] if 'format' in header.keys()
-                    else self.formats['pretty_data_cell']
-            )
-
-            for i in range(1, data_len):
-                sheet.write(
-                        self.get_cell(col, 6 + i),
-                        "",
-                        self.formats[header['format']] if 'format' in header.keys()
-                        else self.formats['pretty_data_cell']
-                )
-
-            if "scale" in header.keys():
-                sheet.conditional_format(self.get_col_range(col, 6, data_len), {
-                    'type':     'cell',
-                    'criteria': '=',
-                    'value':    0,
-                    'format':   self.formats[header['format']] if 'format' in header.keys()
-                                else self.formats['pretty_data_cell']
-                })
-                sheet.conditional_format(self.get_col_range(col, 6, data_len), self.range_formats[header['scale']])
+            sheet.set_column(self.get_col_range(col), 8)
+            if header['key'] == 'team_number':
+                team_num_col = col
+                for pos in range(6):
+                    sheet.set_row(row + 1 + pos, 16)
+                    sheet.write(
+                            self.get_cell(col, row + 1 + pos),
+                            "=LOOKUP($E$2, schedule_match_number, schedule_{}_{})".format('red' if pos < 3 else 'blue',
+                                                                                          (pos % 3) + 1),
+                            self.formats['red_alliance_data_cell' if pos < 3 else 'blue_alliance_data_cell']
+                    )
+                    sheet.conditional_format(
+                        self.get_range(start_col=col, end_col=self.next_col(col, len(analysis_headers)),
+                                       start_row=row + 1 + pos), {
+                            'type':               'formula',
+                            'criteria':           '${0}{1}=$C$2'.format(col, row + 1 + pos),
+                            'format': self.formats['bold']
+                        })
+            else:
+                for pos in range(6):
+                    sheet.write(
+                            self.get_cell(col, row + 1 + pos),
+                            "=LOOKUP({}{}, analysis_team_number, analysis_{})".format(team_num_col, row + 1 + pos,
+                                                                                      header['key']),
+                            self.formats['red_alliance_data_cell' if pos < 3 else 'blue_alliance_data_cell']
+                    )
 
             col = self.next_col(col)
+
+        col = 'A'
+        row = 11
+        team_num_col = col
+        sheet.set_row(row - 1, 70)
+        for key, raw_headers in raw_header_dict.items():
+            for header in raw_headers:
+                sheet.write(
+                        self.get_cell(col, row),
+                        header['title'],
+                        self.formats[header['header_format']] if 'header_format' in header.keys() else self.formats[
+                            'pretty_header']
+                )
+                sheet.set_column(self.get_col_range(col), 8)
+                if header['key'] == 'team_number':
+                    team_num_col = col
+                    for pos in range(6):
+                        sheet.set_row(row + 1 + pos, 16)
+                        sheet.write(
+                                self.get_cell(col, row + 1 + pos),
+                                "=LOOKUP($E$2, schedule_match_number, schedule_{}_{})".format('red' if pos < 3 else 'blue',
+                                                                                              (pos % 3) + 1),
+                                self.formats['red_alliance_data_cell' if pos < 3 else 'blue_alliance_data_cell']
+                        )
+                        sheet.conditional_format(
+                            self.get_range(start_col=col, end_col=self.next_col(col, len(raw_headers)),
+                                           start_row=row + 1 + pos), {
+                                'type':               'formula',
+                                'criteria':           '${0}{1}=$C$2'.format(col, row + 1 + pos),
+                                'format': self.formats['bold']
+                            })
+                else:
+                    for pos in range(6):
+                        sheet.write(
+                                self.get_cell(col, row + 1 + pos),
+                                "=FILTER({}_{}, raw_match=$E$2, raw_team_number=${}{})".format(key, header['key'], team_num_col, row + 1 + pos),
+                                self.formats['red_alliance_data_cell' if pos < 3 else 'blue_alliance_data_cell']
+                        )
+
+                col = self.next_col(col)
+
 
     @staticmethod
     def col_to_num(col):
         return (26 * (len(col) - 1)) + (ord(col[-1]) - ord('A'))
+
+    @staticmethod
+    def get_range(start_col='A', end_col='Z', start_row=None, end_row=None):
+        return "{0}{2}:{1}{3}".format(start_col, end_col, start_row if start_row is not None else "",
+                                      (end_row if end_row is not None else start_row) if start_row is not None else "")
 
     @staticmethod
     def get_col_range(col, start=1, num=None):
@@ -570,7 +718,7 @@ class SpreadsheetGenerator:
 if __name__ == "__main__":
     db = sqlite3.connect('/Users/kestin/db.sqlite')
     tba = TBA('GdZrQUIjmwMZ3XVS622b6aVCh8CLbowJkCs5BmjJl2vxNuWivLz3Sf3PaqULUiZW')
-    filename = ('/Users/kestin/Google Drive/Scouting/Clooney.xlsx')
+    filename = '/Users/kestin/Google Drive/Scouting/Clooney.xlsx'
     gen = SpreadsheetGenerator(db, tba)
     gen.create_spreadsheet_for_event('2018onham', filename=filename)
     gen.upload_to_google_drive(filename)

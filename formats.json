@@ -1,27 +1,23 @@
 {
-  "raw_data_cell":        {
+  "raw_data_cell":           {
     "bg_color":     "#FFFFFF",
     "font_color":   "#000000",
-    "font_size":    10,
     "num_format":   2,
-    "border": true,
+    "border":       true,
     "border_color": "#DADADA"
   },
   "pretty_header":           {
     "bg_color":   "#FFFFFF",
     "font_color": "#000000",
     "bold":       true,
-    "font_size":  10,
     "valign":     "bottom",
     "align":      "center",
     "text_wrap":  "text_wrap",
-    "rotation":   60,
     "border":     true
   },
   "pretty_team_cell":        {
     "bg_color":     "#FFFFFF",
     "font_color":   "#000000",
-    "font_size":    10,
     "valign":       "vcenter",
     "align":        "center",
     "text_wrap":    "text_wrap",
@@ -35,7 +31,6 @@
   "pretty_data_cell":        {
     "bg_color":     "#FFFFFF",
     "font_color":   "#000000",
-    "font_size":    10,
     "valign":       "vcenter",
     "align":        "center",
     "text_wrap":    "text_wrap",
@@ -45,10 +40,21 @@
     "bottom":       true,
     "bottom_color": "#DADADA"
   },
+  "pretty_data_cell_int":        {
+    "bg_color":     "#FFFFFF",
+    "font_color":   "#000000",
+    "valign":       "vcenter",
+    "align":        "center",
+    "text_wrap":    "text_wrap",
+    "num_format":   1,
+    "left":         true,
+    "right":        true,
+    "bottom":       true,
+    "bottom_color": "#DADADA"
+  },
   "pretty_avg_cell":         {
     "bg_color":     "#B2DFDB",
     "font_color":   "#000000",
-    "font_size":    10,
     "valign":       "vcenter",
     "align":        "center",
     "text_wrap":    "text_wrap",
@@ -62,7 +68,6 @@
   "schedule_data_cell":      {
     "bg_color":     "#FFFFFF",
     "font_color":   "#000000",
-    "font_size":    12,
     "valign":       "vcenter",
     "align":        "center",
     "text_wrap":    "text_wrap",
@@ -76,7 +81,6 @@
     "bg_color":   "#FFFFFF",
     "font_color": "#000000",
     "bold":       true,
-    "font_size":  12,
     "valign":     "bottom",
     "align":      "center",
     "text_wrap":  "text_wrap",
@@ -86,7 +90,6 @@
     "bg_color":   "#EF9A9A",
     "font_color": "#000000",
     "bold":       true,
-    "font_size":  12,
     "valign":     "bottom",
     "align":      "center",
     "text_wrap":  "text_wrap",
@@ -95,10 +98,8 @@
   "red_alliance_data_cell":  {
     "bg_color":     "#FFCDD2",
     "font_color":   "#000000",
-    "font_size":    12,
     "valign":       "vcenter",
     "align":        "center",
-    "text_wrap":    "text_wrap",
     "num_format":   1,
     "left":         true,
     "right":        true,
@@ -109,7 +110,6 @@
     "bg_color":   "#90CAF9",
     "font_color": "#000000",
     "bold":       true,
-    "font_size":  12,
     "valign":     "bottom",
     "align":      "center",
     "text_wrap":  "text_wrap",
@@ -118,10 +118,8 @@
   "blue_alliance_data_cell": {
     "bg_color":     "#BBDEFB",
     "font_color":   "#000000",
-    "font_size":    12,
     "valign":       "vcenter",
     "align":        "center",
-    "text_wrap":    "text_wrap",
     "num_format":   1,
     "left":         true,
     "right":        true,
@@ -132,6 +130,14 @@
     "bold": true
   },
   "team_input":              {
-    "bg_color": "#B2DFDB"
+    "num_format": 1,
+    "bg_color":   "#B2DFDB",
+    "border": true,
+    "border_color": "#DADADA"
+  },
+  "team_input_label":        {
+    "bg_color":  "#FFFFFF",
+    "border": true,
+    "border_color": "#DADADA"
   }
 }

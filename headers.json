@@ -200,6 +200,42 @@
       "key":   "tele_defense",
       "value": "=CONCAT(CONCAT(IF(COUNTIF(FILTER(raw_tele_defense, raw_team_number=INDEX(analysis_team_number, ROW())), \"=🔥\")>0, CONCAT(\"  [🔥]\", COUNTIF(FILTER(raw_tele_defense, raw_team_number=INDEX(analysis_team_number, ROW())), \"=🔥\")), \"\"),IF(COUNTIF(FILTER(raw_tele_defense, raw_team_number=INDEX(analysis_team_number, ROW())), \"=👍\")>0, CONCAT(\"  [👍]\", COUNTIF(FILTER(raw_tele_defense, raw_team_number=INDEX(analysis_team_number, ROW())), \"=👍\")), \"\")),CONCAT(IF(COUNTIF(FILTER(raw_defense, raw_team_number=INDEX(analysis_team_number, ROW())), \"=👎\")>0, CONCAT(\"  [👎]\", COUNTIF(FILTER(raw_defense, raw_team_number=INDEX(analysis_team_number, ROW())), \"=👎\")), \"\"),IF(COUNTIF(FILTER(raw_defense, raw_team_number=INDEX(analysis_team_number, ROW())), \"=💩\")>0, CONCAT(\"  [💩]\", COUNTIF(FILTER(raw_defense, raw_team_number=INDEX(analysis_team_number, ROW())), \"=💩\")), \"\")))",
       "width": 14
+    },
+    {
+      "title": "Avg % of Match Cubes Scored",
+      "key":   "calculated_percent_match_cubes",
+      "scale": "max_green",
+      "value": "=IF(ISBLANK(analysis_team_number), \"\", SUMIF(raw_team_number, \"=\"&analysis_team_number, raw_calculated_percent_match_cubes) / analysis_match)"
+    },
+    {
+      "title": "Avg % of Match Scale Cubes Scored",
+      "key":   "calculated_percent_match_scale_cubes",
+      "scale": "max_green",
+      "value": "=IF(ISBLANK(analysis_team_number), \"\", SUMIF(raw_team_number, \"=\"&analysis_team_number, raw_calculated_percent_match_scale_cubes) / analysis_match)"
+    },
+    {
+      "title": "Avg % of Match Switch Cubes Scored",
+      "key":   "calculated_percent_match_switch_cubes",
+      "scale": "max_green",
+      "value": "=IF(ISBLANK(analysis_team_number), \"\", SUMIF(raw_team_number, \"=\"&analysis_team_number, raw_calculated_percent_match_switch_cubes) / analysis_match)"
+    },
+    {
+      "title": "Avg % of Alliance Exchange Cubes Scored",
+      "key":   "calculated_percent_alliance_exchange_cubes",
+      "scale": "max_green",
+      "value": "=IF(ISBLANK(analysis_team_number), \"\", SUMIF(raw_team_number, \"=\"&analysis_team_number, raw_calculated_percent_alliance_exchange_cubes) / analysis_match)"
+    },
+    {
+      "title": "Num Wins",
+      "key":   "calculated_win",
+      "scale": "max_green",
+      "func":  "sum"
+    },
+    {
+      "title": "Avg Score",
+      "key":   "calculated_alliance_score",
+      "scale": "max_green",
+      "func":  "avg"
     }
   ],
   "team_list":      [
@@ -233,113 +269,166 @@
     {
       "value": "=INDEX(raw_match, ROW())",
       "key":   "match",
-      "title": "M#"
+      "title": "M#",
+      "format": "pretty_data_cell_int"
     },
     {
       "value": "=INDEX(raw_pos, ROW())",
       "key":   "pos",
-      "title": "P#"
+      "title": "P#",
+      "format": "pretty_data_cell_int"
     },
     {
       "value": "=INDEX(raw_team_number, ROW())",
       "key":   "team_number",
-      "title": "Team"
+      "title": "Team",
+      "format": "pretty_data_cell_int"
     },
     {
       "value": "=INDEX(raw_tele_scored_scale, ROW()) + INDEX(raw_tele_scored_own_switch, ROW()) + INDEX(raw_tele_scored_opp_switch, ROW()) + INDEX(raw_tele_scored_exchange, ROW())",
       "key":   "tele_cubes_scored",
-      "title": " Cubes Scored"
+      "title": " Cubes Scored",
+      "format": "pretty_data_cell_int"
     },
     {
       "value": "=INDEX(raw_tele_scored_own_switch, ROW()) + INDEX(raw_tele_scored_opp_switch, ROW())",
       "key":   "switch_cubes_scored",
-      "title": " Switch Cubes Scored"
+      "title": " Switch Cubes Scored",
+      "format": "pretty_data_cell_int"
     },
     {
       "value": "=INDEX(raw_auto_scored_scale, ROW()) + INDEX(raw_auto_scored_switch, ROW()) + INDEX(raw_auto_scored_exchange, ROW())",
       "key":   "auto_cubes_scored",
-      "title": "Auto Cubes Scored"
+      "title": "Auto Cubes Scored",
+      "format": "pretty_data_cell_int"
+    },
+    {
+      "value": "=IFERROR(raw_calculated_tele_cubes_scored / SUM(FILTER(raw_calculated_tele_cubes_scored, raw_match=INDEX(raw_calculated_match, ROW()))) * 100, 0)",
+      "key":   "percent_match_cubes",
+      "title": "% of Match Cubes"
+    },
+    {
+      "value": "=IFERROR(raw_tele_scored_scale / SUM(FILTER(raw_tele_scored_scale, raw_match=INDEX(raw_calculated_match, ROW()))) * 100, 0)",
+      "key":   "percent_match_scale_cubes",
+      "title": "% of Match Scale Cubes"
+    },
+    {
+      "value": "=IFERROR((raw_tele_scored_own_switch + raw_tele_scored_opp_switch) / SUM(FILTER(raw_tele_scored_own_switch, raw_match=INDEX(raw_calculated_match, ROW())), FILTER(raw_tele_scored_opp_switch, raw_match=INDEX(raw_calculated_match, ROW()))) * 100, 0)",
+      "key":   "percent_match_switch_cubes",
+      "title": "% of Match Switch Cubes"
+    },
+    {
+      "value": "=IFERROR(raw_tele_scored_exchange / SUM(FILTER(raw_tele_scored_exchange, raw_match=INDEX(raw_calculated_match, ROW()), raw_pos < IF(INDEX(raw_calculated_pos, ROW()) > 2, 6, 3), raw_pos > IF(INDEX(raw_calculated_pos, ROW()) > 2, 2, -1))) * 100, 0)",
+      "key":   "percent_alliance_exchange_cubes",
+      "title": "% of Alliance Exchange Cubes"
+    },
+    {
+      "value": "=LOOKUP(raw_calculated_match, schedule_match_number, IF(raw_calculated_pos < 3, schedule_alliances.red.score, schedule_alliances.blue.score))",
+      "key":   "alliance_score",
+      "title": "Alliance Score",
+      "format": "pretty_data_cell_int"
+    },
+    {
+      "value": "=IF(raw_calculated_alliance_score > LOOKUP(raw_calculated_match, schedule_match_number, IF(raw_calculated_pos < 3, schedule_alliances.blue.score, schedule_alliances.red.score)), 1, 0)",
+      "key":   "win",
+      "title": "Win",
+      "format": "pretty_data_cell_int"
     }
   ],
   "raw":            [
     {
       "key":   "team_number",
-      "title": "Team"
+      "title": "Team",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "match",
-      "title": "M#"
+      "title": "M#",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "pos",
-      "title": "P#"
+      "title": "P#",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "auto_no_move",
-      "title": "Auto No Move"
+      "title": "Auto No Move",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "auto_wrong_switch",
-      "title": "Auto Wrong Side"
+      "title": "Auto Wrong Side",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "auto_scored_exchange",
-      "title": "Auto Scored Ex"
+      "title": "Auto Scored Ex",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "auto_scored_switch",
-      "title": "Auto Scored Switch"
+      "title": "Auto Scored Switch",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "auto_scored_scale",
-      "title": "Auto Scored Scale"
+      "title": "Auto Scored Scale",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "tele_scored_exchange",
-      "title": "Scored Exchange"
+      "title": "Scored Exchange",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "tele_scored_own_switch",
-      "title": "Scored Own Switch"
+      "title": "Scored Own Switch",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "tele_scored_opp_switch",
-      "title": "Scored Opp Switch"
+      "title": "Scored Opp Switch",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "tele_scored_scale",
-      "title": "Scored Scale"
+      "title": "Scored Scale",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "tele_descored_scale",
-      "title": "Knocked Off Scale"
+      "title": "Knocked Off Scale",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "tele_dropped_cubes",
-      "title": "Dropped Cubes"
+      "title": "Dropped Cubes",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "tele_climbed_self",
-      "title": "Lifted Self",
-      "width": 12
+      "title": "Lifted Self"
     },
     {
       "key":   "tele_setup_climb_time",
-      "title": "Setup Climb",
-      "width": 16
+      "title": "Setup Climb"
     },
     {
       "key":   "tele_partners_lifted",
-      "title": "Partners Lifted"
+      "title": "Partners Lifted",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "tele_partners_attempted",
       "title": "Partners Attempted",
+      "format": "pretty_data_cell_int",
       "hidden": true
     },
     {
       "key":   "tele_partner_dropped",
-      "title": "Dropped Partner"
+      "title": "Dropped Partner",
+      "format": "pretty_data_cell_int"
     },
     {
       "key":   "tele_lifted_by_partner",
@@ -347,13 +436,11 @@
     },
     {
       "key":   "tele_parked",
-      "title": "Parked",
-      "width": 12
+      "title": "Parked"
     },
     {
       "key":   "tele_defense",
-      "title": "Defense",
-      "width": 12
+      "title": "Defense"
     }
   ]
 }
