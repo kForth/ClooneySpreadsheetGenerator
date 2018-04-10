@@ -28,7 +28,6 @@ class SpreadsheetGenerator:
             'raw_team_list':        'raw_team_list',
             'raw_matches':          'raw_matches',
             'raw_team_schedule':    'raw_team_schedule',
-            'pretty_team_image':    'Team Image',
             'pretty_raw':           'Raw Data',
             'pretty_team_list':     'Team List',
             'pretty_analysis':      'Analysis',
@@ -645,7 +644,6 @@ class SpreadsheetGenerator:
                         )
 
                 col = self.next_col(col)
-
 
     @staticmethod
     def col_to_num(col):
