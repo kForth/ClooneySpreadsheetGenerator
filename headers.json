@@ -53,6 +53,192 @@
       "key":           "alliances.blue.score",
       "format":        "blue_alliance_data_cell",
       "header_format": "blue_alliance_header"
+    },
+    {
+      "title":         "Red RP",
+      "key":           "score_breakdown.red.rp",
+      "format":        "red_alliance_data_cell",
+      "header_format": "red_alliance_header"
+    },
+    {
+      "title":         "Blue RP",
+      "key":           "score_breakdown.blue.rp",
+      "format":        "blue_alliance_data_cell",
+      "header_format": "blue_alliance_header"
+    },
+    {
+      "title":         "Red Auto Switch Ownership Sec",
+      "key":           "score_breakdown.red.autoSwitchOwnershipSec",
+      "format":        "red_alliance_data_cell",
+      "header_format": "red_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Blue Auto Switch Ownership Sec",
+      "key":           "score_breakdown.blue.autoSwitchOwnershipSec",
+      "format":        "blue_alliance_data_cell",
+      "header_format": "blue_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Red Auto Scale Ownership Sec",
+      "key":           "score_breakdown.red.autoScaleOwnershipSec",
+      "format":        "red_alliance_data_cell",
+      "header_format": "red_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Blue Auto Scale Ownership Sec",
+      "key":           "score_breakdown.blue.autoScaleOwnershipSec",
+      "format":        "blue_alliance_data_cell",
+      "header_format": "blue_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Red Auto Run Points",
+      "key":           "score_breakdown.red.autoRunPoints",
+      "format":        "red_alliance_data_cell",
+      "header_format": "red_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Blue Auto Run Points",
+      "key":           "score_breakdown.blue.autoRunPoints",
+      "format":        "blue_alliance_data_cell",
+      "header_format": "blue_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Red Tele Switch Ownership Sec",
+      "key":           "score_breakdown.red.teleopSwitchOwnershipSec",
+      "format":        "red_alliance_data_cell",
+      "header_format": "red_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Blue Tele Switch Ownership Sec",
+      "key":           "score_breakdown.blue.teleopSwitchOwnershipSec",
+      "format":        "blue_alliance_data_cell",
+      "header_format": "blue_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Red Tele Scale Ownership Sec",
+      "key":           "score_breakdown.red.teleopScaleOwnershipSec",
+      "format":        "red_alliance_data_cell",
+      "header_format": "red_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Blue Tele Scale Ownership Sec",
+      "key":           "score_breakdown.blue.teleopScaleOwnershipSec",
+      "format":        "blue_alliance_data_cell",
+      "header_format": "blue_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Red Climb Points",
+      "key":           "score_breakdown.red.endgamePoints",
+      "format":        "red_alliance_data_cell",
+      "header_format": "red_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Blue Climb Points",
+      "key":           "score_breakdown.blue.endgamePoints",
+      "format":        "blue_alliance_data_cell",
+      "header_format": "blue_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Red Boost",
+      "key":           "score_breakdown.red.vaultBoostPlayed",
+      "format":        "red_alliance_data_cell",
+      "header_format": "red_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Blue Boost",
+      "key":           "score_breakdown.blue.vaultBoostPlayed",
+      "format":        "blue_alliance_data_cell",
+      "header_format": "blue_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Red Force",
+      "key":           "score_breakdown.red.vaultForcePlayed",
+      "format":        "red_alliance_data_cell",
+      "header_format": "red_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Blue Force",
+      "key":           "score_breakdown.blue.vaultForcePlayed",
+      "format":        "blue_alliance_data_cell",
+      "header_format": "blue_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Red Levitate",
+      "key":           "score_breakdown.red.vaultLevitatePlayed",
+      "format":        "red_alliance_data_cell",
+      "header_format": "red_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Blue Levitate",
+      "key":           "score_breakdown.blue.vaultLevitatePlayed",
+      "format":        "blue_alliance_data_cell",
+      "header_format": "blue_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Red Home Switch Cubes",
+      "key":           "red_own_switch_cubes",
+      "value":         "=IFERROR(SUM(FILTER(raw_tele_scored_own_switch, raw_match=INDEX(schedule_match_number, ROW()), raw_pos < 3)))",
+      "format":        "red_alliance_data_cell",
+      "header_format": "red_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Blue Away Switch Cubes",
+      "key":           "blue_opp_switch_cubes",
+      "value":         "=IFERROR(SUM(FILTER(raw_tele_scored_opp_switch, raw_match=INDEX(schedule_match_number, ROW()), raw_pos > 2)))",
+      "format":        "blue_alliance_data_cell",
+      "header_format": "blue_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Red Away Switch Cubes",
+      "key":           "red_opp_switch_cubes",
+      "value":         "=IFERROR(SUM(FILTER(raw_tele_scored_opp_switch, raw_match=INDEX(schedule_match_number, ROW()), raw_pos < 3)))",
+      "format":        "red_alliance_data_cell",
+      "header_format": "red_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Blue Home Switch Cubes",
+      "key":           "blue_own_switch_cubes",
+      "value":         "=IFERROR(SUM(FILTER(raw_tele_scored_own_switch, raw_match=INDEX(schedule_match_number, ROW()), raw_pos > 2)))",
+      "format":        "blue_alliance_data_cell",
+      "header_format": "blue_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Red Scale Cubes",
+      "key":           "red_scale_cubes",
+      "value":         "=IFERROR(SUM(FILTER(raw_tele_scored_scale, raw_match=INDEX(schedule_match_number, ROW()), raw_pos < 3)))",
+      "format":        "red_alliance_data_cell",
+      "header_format": "red_alliance_header",
+      "hidden": true
+    },
+    {
+      "title":         "Blue Scale Cubes",
+      "key":           "blue_scale_cubes",
+      "value":         "=IFERROR(SUM(FILTER(raw_tele_scored_scale, raw_match=INDEX(schedule_match_number, ROW()), raw_pos > 2)))",
+      "format":        "blue_alliance_data_cell",
+      "header_format": "blue_alliance_header",
+      "hidden": true
     }
   ],
   "analysis":       [
@@ -303,7 +489,7 @@
       "format": "pretty_data_cell_int"
     },
     {
-      "value": "=IFERROR(raw_calculated_tele_cubes_scored / SUM(FILTER(raw_calculated_tele_cubes_scored, raw_match=INDEX(raw_calculated_match, ROW()))) * 100, 0)",
+      "value": "=IFERROR(raw_calculated_tele_cubes_scored / SUM(FILTER(raw_calculated_tele_cubes_scored, raw_calculated_match=INDEX(raw_calculated_match, ROW()))) * 100, 0)",
       "key":   "percent_match_cubes",
       "title": "% of Match Cubes"
     },
